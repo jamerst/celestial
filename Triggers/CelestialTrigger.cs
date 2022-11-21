@@ -6,19 +6,46 @@ public class CelestialTrigger : Trigger
 {
     public const string TypeName = "Celestial";
 
-    public override bool IsUtc => true;
-
     public CelestialTime Time { get; set; }
     public TimeSpan? Offset { get; set; }
 
-    public override DateTime? GetNextOccurrence(DateTime now, Settings settings)
-        => GetNextOccurrence(now, now, settings);
+    public override DateTime? GetPreviousOccurrence(DateTime before, Settings settings)
+    {
+        DateTime utc = TimeZoneInfo.ConvertTimeToUtc(before, TimeZoneInfo.Local);
 
-    private DateTime? GetNextOccurrence(DateTime now, DateTime day, Settings settings)
+        DateTime? result = GetOccurrenceUtc(utc, utc, settings, (r, n) => r <= n, d => d.AddDays(-1));
+
+        if (result.HasValue)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(result.Value, TimeZoneInfo.Local);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public override DateTime? GetNextOccurrence(DateTime now, Settings settings)
+    {
+        DateTime utc = TimeZoneInfo.ConvertTimeToUtc(now, TimeZoneInfo.Local);
+
+        DateTime? result = GetOccurrenceUtc(utc, utc, settings, (r, n) => r >= n, d => d.AddDays(1));
+
+        if (result.HasValue)
+        {
+            return TimeZoneInfo.ConvertTimeFromUtc(result.Value, TimeZoneInfo.Local);
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    private DateTime? GetOccurrenceUtc(DateTime now, DateTime day, Settings settings, Func<DateTime?, DateTime, bool> isInRange, Func<DateTime, DateTime> getNextDay)
     {
         Coordinate c = new Coordinate(
-            settings.Latitude ?? throw new ArgumentNullException("Latitude must be provided to use celestial triggers"),
-            settings.Longitude ?? throw new ArgumentNullException("Longitude must be provided to use celestial triggers"),
+            settings.Latitude ?? throw new InvalidOperationException("Latitude must be provided to use celestial triggers"),
+            settings.Longitude ?? throw new InvalidOperationException("Longitude must be provided to use celestial triggers"),
             day
         );
 
@@ -41,18 +68,13 @@ public class CelestialTrigger : Trigger
                 result = result.Value + Offset.Value;
             }
 
-            if (result > now)
+            if (!isInRange(result, now))
             {
-                return result;
-            }
-            else
-            {
-                // return occurrence tomorrow if in past
-                return GetNextOccurrence(now, day.AddDays(1), settings);
+                return GetOccurrenceUtc(now, getNextDay(day), settings, isInRange, getNextDay);
             }
         }
 
-        return null;
+        return result;
     }
 
     public override string ToString()

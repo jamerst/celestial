@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 using Celestial.Triggers;
 
-namespace Celestial.Converters;
+namespace Celestial.Serialization;
 
 public class TriggerConverter : JsonConverter<Trigger>
 {

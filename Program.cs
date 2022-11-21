@@ -1,20 +1,21 @@
-﻿using System.Globalization;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using Celestial;
 
-Settings settings = await Settings.LoadFromFileAsync();
-
-var cultureInfo = CultureInfo.CurrentCulture;
+if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+{
+    // hide the command window that is shown when the worker is running
+    // ideally this app would run as a Windows Service, but user services aren't a thing on Windows apparently
+    WindowsCrap.HideWindow();
+}
 
 IHostBuilder builder = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services =>
     {
         services.AddHostedService<Worker>();
         services.AddProviders();
-        services.AddSingleton(settings);
     });
 
 if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

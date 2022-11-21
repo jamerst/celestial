@@ -6,11 +6,25 @@ public class TimeTrigger : Trigger
 
     public TimeOnly Time { get; set; }
 
-    public override DateTime? GetNextOccurrence(DateTime now, Settings _)
+    public override DateTime? GetPreviousOccurrence(DateTime now, Settings _)
     {
         DateTime today = now.Date + Time.ToTimeSpan();
 
-        if (today > now)
+        if (today <= now)
+        {
+            return today;
+        }
+        else
+        {
+            return today.AddDays(-1);
+        }
+    }
+
+    public override DateTime? GetNextOccurrence(DateTime now, Settings settings)
+    {
+        DateTime today = GetPreviousOccurrence(now, settings)!.Value;
+
+        if (today >= now)
         {
             return today;
         }

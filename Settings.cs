@@ -1,8 +1,9 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Encodings.Web;
+using Microsoft.Extensions.Logging;
 
-using Celestial.Converters;
+using Celestial.Serialization;
 using Celestial.Triggers;
 
 namespace Celestial;
@@ -14,15 +15,8 @@ public class Settings
     public double? Latitude { get; set; }
     public double? Longitude { get; set; }
 
-
-    public static async Task<Settings> LoadFromFileAsync()
+    public static async Task<Settings> LoadFromFileAsync(string path, ILogger logger)
     {
-        string path = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "celestial",
-            "config.json"
-        );
-
         JsonSerializerOptions options = GetJsonOptions();
 
         if (File.Exists(path))
@@ -33,20 +27,22 @@ public class Settings
 
                 if (read != null)
                 {
+                    logger.LogInformation("Successfully loaded settings from {path}", path);
                     return read;
                 }
             }
         }
 
-        Console.WriteLine($@"Generating new config file with default options: ""{path}""");
+        logger.LogInformation("Generating new config file with defaults at {path}", path);
+
         FileInfo info = new FileInfo(path);
         if (info.Directory != null)
         {
+            logger.LogInformation("Config directory {directory} does not exist, creating", info.DirectoryName);
             info.Directory.Create();
         }
 
         Settings settings = new Settings();
-
         using (var fs = new FileStream(path, FileMode.Create))
         {
             await JsonSerializer.SerializeAsync(fs, settings, options);

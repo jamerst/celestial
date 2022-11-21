@@ -1,0 +1,10 @@
+[Unit]
+Description=celestial
+
+[Service]
+Type=notify
+ExecStart=/home/james/.local/bin/celestial
+Restart=on-failure
+
+[Install]
+WantedBy=default.target

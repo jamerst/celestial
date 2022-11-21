@@ -94,7 +94,7 @@ Triggers 30 minutes after dusk
 {
     "type": "Celestial",
     "time": "Dusk",
-    "offset": "00:45:00",
+    "offset": "00:30:00",
     "path": "/path/to/some/image.png"
 }
 ```

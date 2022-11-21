@@ -105,50 +105,50 @@ Triggers 30 minutes after dusk
   "triggers": [
     {
         "type": "Celestial",
-        "time": "Dawn,
+        "time": "Dawn",
         "path": "/home/james/Pictures/Wallpapers/1.png"
     },
     {
         "type": "Celestial",
-        "time": "SunUp,
+        "time": "SunUp",
         "path": "/home/james/Pictures/Wallpapers/2.png"
     },
     {
         "type": "Celestial",
-        "time": "Noon,
+        "time": "Noon",
         "offset": "-01:30:00",
         "path": "/home/james/Pictures/Wallpapers/3.png"
     },
     {
         "type": "Celestial",
-        "time": "Noon,
+        "time": "Noon",
         "path": "/home/james/Pictures/Wallpapers/4.png"
     },
     {
         "type": "Celestial",
-        "time": "Noon,
+        "time": "Noon",
         "offset": "01:30:00",
         "path": "/home/james/Pictures/Wallpapers/5.png"
     },
     {
         "type": "Celestial",
-        "time": "Sunset,
+        "time": "Sunset",
         "offset": "-01:00:00",
         "path": "/home/james/Pictures/Wallpapers/6.png"
     },
     {
         "type": "Celestial",
-        "time": "Sunset,
+        "time": "Sunset",
         "path": "/home/james/Pictures/Wallpapers/7.png"
     },
     {
         "type": "Celestial",
-        "time": "Dusk,
+        "time": "Dusk",
         "path": "/home/james/Pictures/Wallpapers/8.png"
     },
     {
         "type": "Time",
-        "time": "22:00:00,
+        "time": "22:00:00",
         "path": "/home/james/Pictures/Wallpapers/9.png"
     },
   ],

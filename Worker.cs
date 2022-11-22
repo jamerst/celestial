@@ -26,13 +26,6 @@ public class Worker : BackgroundService
     {
         await LoadSettingsAsync(stoppingToken);
 
-        if (!settings.Triggers.Any())
-        {
-            _logger.LogCritical("No triggers defined, exiting");
-            _host.StopApplication();
-            return;
-        }
-
         _logger.LogInformation("Using provider {provider}", _provider.GetName());
 
         using (var watcher = new FileSystemWatcher(Path.GetDirectoryName(GetConfigPath())!))
@@ -43,6 +36,32 @@ public class Worker : BackgroundService
 
             watcher.Changed += OnConfigFileChange;
 
+            if (!settings.Triggers.Any())
+            {
+                _logger.LogCritical("No triggers defined, waiting for config file change");
+
+                try
+                {
+                    // delay of -1ms waits indefinitely
+                    await Task.Delay(-1, ctsCombined.Token);
+                }
+                catch (TaskCanceledException e)
+                {
+                    if (e.CancellationToken == ctsCombined.Token)
+                    {
+                        if (ctsConfig.IsCancellationRequested && !stoppingToken.IsCancellationRequested)
+                        {
+                            _logger.LogInformation("Config file change detected, reloading settings");
+                            await LoadSettingsAsync(stoppingToken);
+                        }
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+            }
+
             SetInitialBackground();
 
             await RunAsync(stoppingToken);
@@ -52,14 +71,14 @@ public class Worker : BackgroundService
     private void SetInitialBackground()
     {
         var previousTrigger = settings.Triggers
-            .Select(t => new { Trigger = t, Today = t.GetPreviousOccurrence(DateTime.Today, settings) })
-            .Where(t => t.Today < DateTime.Now)
-            .OrderByDescending(t => t.Today)
+            .Select(t => new { Trigger = t, Previous = t.GetPreviousOccurrence(DateTime.Now, settings) })
+            .Where(t => t.Previous < DateTime.Now)
+            .OrderByDescending(t => t.Previous)
             .FirstOrDefault();
 
         if (previousTrigger != null)
         {
-            _logger.LogInformation("Setting initial state from previous trigger {trigger} ({time})", previousTrigger.Trigger, previousTrigger.Today?.ToString("s"));
+            _logger.LogInformation("Setting initial state from previous trigger {trigger} ({time})", previousTrigger.Trigger, previousTrigger.Previous?.ToString("s"));
             try
             {
                 _provider.SetBackground(previousTrigger.Trigger.Path);
@@ -116,10 +135,9 @@ public class Worker : BackgroundService
                 {
                     _logger.LogInformation("Next trigger is {trigger} in {delay} ({time})", nextTrigger, delay, next?.ToString("s"));
 
-                    // wait until trigger time (if in future)
-
                     try
                     {
+                        // wait until trigger time (if in future)
                         await Task.Delay(delay, ctsCombined.Token);
                     }
                     catch (TaskCanceledException e)
@@ -136,7 +154,7 @@ public class Worker : BackgroundService
                         }
                         else
                         {
-                            throw e;
+                            throw;
                         }
                     }
                 }
@@ -169,6 +187,7 @@ public class Worker : BackgroundService
     {
         if (e.ChangeType == WatcherChangeTypes.Changed || e.ChangeType == WatcherChangeTypes.Created)
         {
+            // request cancellation to break out of any Task.Delays in progress and reload settings
             ctsConfig.Cancel();
         }
     }

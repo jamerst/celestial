@@ -150,7 +150,7 @@ Triggers 30 minutes after dusk
         "type": "Time",
         "time": "22:00:00",
         "path": "/home/james/Pictures/Wallpapers/9.png"
-    },
+    }
   ],
   "latitude": 12.34,
   "longitude": -1.23

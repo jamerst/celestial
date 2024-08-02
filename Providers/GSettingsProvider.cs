@@ -14,11 +14,13 @@ public abstract class GSettingsProvider : IProvider
     protected abstract string Schema { get; }
     protected abstract string Key { get; }
 
-    public void SetBackground(string path)
+    public Task SetBackgroundAsync(string path)
     {
         _logger.LogInformation("Setting GSettings desktop background to {path}", path);
 
         new GLib.Settings(Schema).SetString(Key, $"file://{path}");
+
+        return Task.CompletedTask;
     }
 
     public abstract string GetName();

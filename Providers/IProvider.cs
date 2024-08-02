@@ -2,6 +2,6 @@ namespace Celestial.Providers;
 
 public interface IProvider
 {
-    void SetBackground(string path);
+    Task SetBackgroundAsync(string path);
     string GetName();
 }

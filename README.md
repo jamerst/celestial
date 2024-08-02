@@ -2,7 +2,7 @@
 Automatically change your desktop background based on the time of day.
 
 ## Features
-- Supports Windows and Linux (GNOME and Cinnamon desktop environments)
+- Supports Windows, macOS and Linux (GNOME and Cinnamon desktop environments)
 - Constant time or celestial-based triggers
 - Simple background service/app
 
@@ -18,9 +18,19 @@ The easiest way to run celestial on Linux is with a systemd user service. To set
 ### Windows
 Unfortunately user services aren't a thing on Windows, so the easiest way to run celestial on Windows is to set up a scheduled task to start `celestial.exe` on login.
 
+### macOS
+To install simply install `Celestial.app` and add it to your login items.
+
+You can also run the celestial binary yourself if you prefer (you will need to have [desktoppr](https://github.com/scriptingosx/desktoppr) installed).
+
 ## Configuration
 
-celestial will create a config file on first start at `~/.config/celestial/config.json` or `%APPDATA%\Roaming\celestial\config.json`. All configuration is performed through this file. celestial will automatically reload the settings if a change is made to the file.
+The celestial config file is created at one of the following locations (depending on your OS):
+- Linux: `~/.config/celestial/config.json`
+- Windows: `%APPDATA%\Roaming\celestial\config.json`
+- maxOS: `~/Library/Application Support/celestial/config.json`
+
+celestial will create a config file on first start if it does not already exist. All configuration is performed through this file. celestial will automatically reload the settings if a change is made to the file.
 
 ```
 {

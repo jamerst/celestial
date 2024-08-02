@@ -3,7 +3,6 @@ using System.Text.Json.Serialization;
 using System.Text.Encodings.Web;
 using Microsoft.Extensions.Logging;
 
-using Celestial.Serialization;
 using Celestial.Triggers;
 
 namespace Celestial;
@@ -61,7 +60,6 @@ public class Settings
             PropertyNameCaseInsensitive = true
         };
 
-        options.Converters.Add(new TriggerConverter());
         options.Converters.Add(new JsonStringEnumConverter());
 
         return options;

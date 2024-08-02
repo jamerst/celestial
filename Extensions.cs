@@ -36,6 +36,14 @@ public static class Extensions
         {
             services.AddSingleton<IProvider, Windows>();
         }
+        else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            services.AddSingleton<IProvider, MacOS>();
+        }
+        else
+        {
+            throw new InvalidOperationException("Operating system not supported");
+        }
 
         return services;
     }

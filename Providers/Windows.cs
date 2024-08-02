@@ -12,10 +12,12 @@ public class Windows : IProvider
         _logger = logger;
     }
 
-    public void SetBackground(string path)
+    public Task SetBackgroundAsync(string path)
     {
         _logger.LogInformation("Setting Windows desktop background to {path}", path);
         SystemParametersInfo(SPI_SETDESKWALLPAPER, 1, path, SPIF_UPDATEINIFILE);
+
+        return Task.CompletedTask;
     }
 
     public string GetName() => "Windows (SPI)";

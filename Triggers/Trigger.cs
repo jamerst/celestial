@@ -1,9 +1,13 @@
+using System.Text.Json.Serialization;
+
 namespace Celestial.Triggers;
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
+[JsonDerivedType(typeof(TimeTrigger), TimeTrigger.TypeName)]
+[JsonDerivedType(typeof(CelestialTrigger), CelestialTrigger.TypeName)]
 public abstract class Trigger
 {
-    public string Path { get; set; } = null!;
-    public string Type { get; set; } = null!;
+    public required string Path { get; set; }
 
     /// <summary>
     /// Get the previous trigger date/time before <paramref name="now"/>

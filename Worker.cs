@@ -62,13 +62,13 @@ public class Worker : BackgroundService
                 }
             }
 
-            SetInitialBackground();
+            await SetInitialBackgroundAsync();
 
             await RunAsync(stoppingToken);
         }
     }
 
-    private void SetInitialBackground()
+    private async Task SetInitialBackgroundAsync()
     {
         var previousTrigger = settings.Triggers
             .Select(t => new { Trigger = t, Previous = t.GetPreviousOccurrence(DateTime.Now, settings) })
@@ -81,7 +81,7 @@ public class Worker : BackgroundService
             _logger.LogInformation("Setting initial state from previous trigger {trigger} ({time})", previousTrigger.Trigger, previousTrigger.Previous?.ToString("s"));
             try
             {
-                _provider.SetBackground(previousTrigger.Trigger.Path);
+                await _provider.SetBackgroundAsync(previousTrigger.Trigger.Path);
             }
             catch (Exception e)
             {
@@ -148,7 +148,7 @@ public class Worker : BackgroundService
                             {
                                 _logger.LogInformation("Config file change detected, reloading settings");
                                 await LoadSettingsAsync(stoppingToken);
-                                SetInitialBackground();
+                                await SetInitialBackgroundAsync();
                                 continue;
                             }
                         }
@@ -166,7 +166,7 @@ public class Worker : BackgroundService
 
                     try
                     {
-                        _provider.SetBackground(nextTrigger.Path);
+                        await _provider.SetBackgroundAsync(nextTrigger.Path);
                     }
                     catch (Exception e)
                     {
